@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.util.*;
 
-class Haffman {
+public class Haffman {
 
 
     private String s = "", binaryCode = "", finalCode = "", ss = "";
@@ -13,7 +13,7 @@ class Haffman {
     private HashMap<Integer, String> map = new HashMap<>();
 
 
-    void zipHim(String j) throws FileNotFoundException {
+    public void zipHim(String j) throws FileNotFoundException {
 //Считываем весь текст в строку:
         Scanner in = new Scanner(new File(j));
         while (in.hasNext()) {
@@ -105,7 +105,7 @@ class Haffman {
         }
     }
 
-    void unpackHim(String j) throws FileNotFoundException {
+    public void unpackHim(String j) throws FileNotFoundException {
 //Считываем весь текст в строку:
         Scanner in = new Scanner(new File(j));
         while (in.hasNext()) {
@@ -171,7 +171,7 @@ class Haffman {
     }
 
 
-   private void writeUnicode(String way, String text) {
+    private void writeUnicode(String way, String text) {
         try (PrintWriter printWriter = new PrintWriter(
                 new BufferedWriter(
                         new OutputStreamWriter(

@@ -1,45 +1,43 @@
 package ru.kpfu.itis.group11506.semestr2;
 
-class BinaryList implements Comparable<BinaryList> {
+public class BinaryList implements Comparable<BinaryList> {
 
     private int value;
     private int frequency;
     private BinaryList Left;
     private BinaryList Right;
 
-     int getFrequency() {
+    public int getFrequency() {
         return frequency;
     }
 
-     void setFrequency(int frequency) {
+    public void setFrequency(int frequency) {
         this.frequency = frequency;
     }
 
-     int getValue() {
+    public int getValue() {
         return value;
     }
 
-     void setValue(int value) {
+    public void setValue(int value) {
         this.value = value;
     }
 
-     BinaryList getLeft() {
+    public BinaryList getLeft() {
         return Left;
     }
 
-     void setLeft(BinaryList left) {
+    public void setLeft(BinaryList left) {
         Left = left;
     }
 
-    BinaryList getRight() {
+    public BinaryList getRight() {
         return Right;
     }
 
-     void setRight(BinaryList right) {
+    public void setRight(BinaryList right) {
         Right = right;
     }
-
-
 
 
     @Override
