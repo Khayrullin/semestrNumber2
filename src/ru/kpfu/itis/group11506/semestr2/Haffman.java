@@ -20,10 +20,11 @@ public class Haffman {
             s += in.nextLine() + "\n";
         }
         in.close();
-        ints1 = new int[s.length()];
+        ints1 = new int[s.length() - 2];
         int index = 0;
-        for (char ch : s.toCharArray()) {
-            ints1[index] = (int) ch;
+        char[] chars = s.toCharArray();
+        for (int i = 1; i < s.length() - 1; i++) {
+            ints1[index] = (int) chars[i];
             index += 1;
         }
 // Создаем Аррей лист, и записываем туда РАЗНЫЕ буквы из текста + их частота появления в тексте:
