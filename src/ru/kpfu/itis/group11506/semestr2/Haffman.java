@@ -10,10 +10,11 @@ import java.util.*;
 public class Haffman {
 
 
-    private String s = "", binaryCode = "", finalCode = "", ss = "";
-    private int[] ints1;
-    private BinaryList treeHead;
-    private HashMap<Integer, String> map = new HashMap<>();
+    private String s = "", binaryCode = "", finalCode = "", ss = "", stringReprOfTree = "";
+    private int[] ints1, ints;
+    private int currentLength;
+    private BinaryList takenTreeHead;
+    private Map<Integer, String> map = new HashMap<>();
 
 
     public String zipHim(String j) throws FileNotFoundException {
@@ -27,7 +28,9 @@ public class Haffman {
 //Делаем дерево Хаффмана:
         createTree(priorityQueue);
 //Выявляем Центральный узел Дерева:
-        treeHead = priorityQueue.poll();
+        BinaryList treeHead = priorityQueue.poll();
+//Кодируем дерево  в строку.
+        createStringRepresentationOfTree(treeHead);
 // Строим Таблицу Хаффмана:
         createMap("", treeHead);
 // Создаем Строку с бинарным кодом для последующих преобразований:
@@ -37,9 +40,24 @@ public class Haffman {
 //Финальные преобразования бинарного кода в Символы - запись в finalCode:
         transform();
 //Запись конечной сжатой строки в файл:
+        finalCode = stringReprOfTree + "x"+ints1.length+"y" + finalCode;
         return finalCode;
-
     }
+
+
+    public String unpackHim(String j) throws IOException {
+//Считываем весь текст в строку,(далее в массив интов)отделяем Код Дерева от Закодированного кода:
+        ints = getInts(j);
+//Создаем дерево из кода :
+        createUnpackedTree();
+//Для каждой буквы делаем двоичное представление добавляя если нехватает Лидирующие нули чтобы достичь
+// длины 8 для однозначного декодирования.
+        String binaryCode2 = getString(ints);
+//Проходимся по дереву считывая нули и еденицы, если дошли до узла имеющего символ, конкатенируем его в
+// строку 'unpackedText', после этого начинаем опять с центрального узла считывать другие символы.
+        return getString(binaryCode2);
+    }
+
 
     private void transform() {
         int lastIndex = 0;
@@ -53,6 +71,7 @@ public class Haffman {
         }
     }
 
+
     private void createTree(PriorityQueue<BinaryList> priorityQueue) {
         while (priorityQueue.size() != 1) {
             BinaryList binaryList1 = priorityQueue.poll();
@@ -65,6 +84,7 @@ public class Haffman {
         }
     }
 
+
     private PriorityQueue<BinaryList> getBinaryLists(List<BinaryList> arrayList) {
         PriorityQueue<BinaryList> priorityQueue = new PriorityQueue<>();
         Iterator it = arrayList.iterator();
@@ -73,6 +93,7 @@ public class Haffman {
         }
         return priorityQueue;
     }
+
 
     private List<BinaryList> getBinaryLists() {
         List<BinaryList> arrayList = new ArrayList<>();
@@ -102,6 +123,7 @@ public class Haffman {
         return arrayList;
     }
 
+
     private void readFromFile(String j) throws FileNotFoundException {
         Scanner in = new Scanner(new File(j));
         while (in.hasNext()) {
@@ -130,35 +152,46 @@ public class Haffman {
         }
     }
 
-    public String unpackHim(String j) throws IOException {
-//Считываем весь текст в строку:
+    private void createStringRepresentationOfTree(BinaryList list) {
+        if (list.getRight() == null && list.getLeft() == null) {
+            stringReprOfTree = stringReprOfTree + "1" + Character.toString((char) list.getValue());
+        } else {
+            createStringRepresentationOfTree(list.getLeft());
+            createStringRepresentationOfTree(list.getRight());
+            stringReprOfTree = stringReprOfTree + "0";
 
-        int[] ints = getInts(j);
-
-//Для каждой буквы делаем двоичное представление добавляя если нехватает Лидирующие нули чтобы достичь
-// длины 8 для однозначного декодирования.
-
-        String binaryCode2 = getString(ints);
-
-//Проходимся по дереву считывая нули и еденицы, если дошли до узла имеющего символ, конкатенируем его в
-// строку 'unpackedText', после этого начинаем опять с центрального узла считывать другие символы.
-
-        String unpackedText = getString(binaryCode2);
-        return unpackedText;
+        }
+    }
 
 
+    private void createUnpackedTree() {
+        Stack<BinaryList> stack = new Stack<>();
+        for (int i = 0; i < stringReprOfTree.length(); i++) {
+            if (stringReprOfTree.charAt(i) == '1') {
+                BinaryList binaryList = new BinaryList();
+                binaryList.setValue((int) (stringReprOfTree.charAt(i + 1)));
+                stack.push(binaryList);
+                i += 1;
+            } else {
+                BinaryList binaryList = new BinaryList();
+                binaryList.setRight(stack.pop());
+                binaryList.setLeft(stack.pop());
+                stack.push(binaryList);
+            }
+        }
+        takenTreeHead = stack.pop();
     }
 
     private String getString(String binaryCode2) {
         int length = 0;
-        BinaryList word = treeHead;
+        BinaryList word = takenTreeHead;
         String unpackedText = "";
         char[] array = binaryCode2.toCharArray();
-        for (int i = 0; i < array.length && length < ints1.length; i++) {
+        for (int i = 0; i < array.length && length < currentLength; i++) {
             if (array[i] == '0') {
                 if (word.getLeft().getValue() != 0) {
                     unpackedText = unpackedText + Character.toString((char) word.getLeft().getValue());
-                    word = treeHead;
+                    word = takenTreeHead;
                     length += 1;
                 } else {
                     word = word.getLeft();
@@ -166,7 +199,7 @@ public class Haffman {
             } else {
                 if (word.getRight().getValue() != 0) {
                     unpackedText = unpackedText + Character.toString((char) word.getRight().getValue());
-                    word = treeHead;
+                    word = takenTreeHead;
                     length += 1;
                 } else {
                     word = word.getRight();
@@ -198,16 +231,20 @@ public class Haffman {
             ss += in.nextLine() + "\r";
         }
         in.close();
-        int[] ints = new int[ss.length()];
+        stringReprOfTree = ss.substring(0, ss.indexOf("x"));
+        currentLength = Integer.parseInt(ss.substring(ss.indexOf("x")+1, ss.indexOf("y")));
 
+        int[] ints = new int[ss.length() - ss.indexOf("y")];
         try (FileReader reader = new FileReader(j)) {
-            int c, i = 0;
+            int c, i = 0, indexAfterTree = ss.indexOf("y");
             while ((c = reader.read()) != -1) {
-                ints[i] = (char) c;
-                i += 1;
+                if (indexAfterTree > -1) {
+                    indexAfterTree -= 1;
+                } else {
+                    ints[i] = (char) c;
+                    i += 1;
+                }
             }
-        } catch (IOException ex) {
-            throw ex;
         }
         return ints;
     }
