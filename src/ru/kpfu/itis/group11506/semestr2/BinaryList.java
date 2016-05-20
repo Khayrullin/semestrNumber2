@@ -4,9 +4,8 @@ public class BinaryList implements Comparable<BinaryList> {
 
     private int value;
     private int frequency;
-    // Java code convention?
-    private BinaryList Left;
-    private BinaryList Right;
+    private BinaryList left;
+    private BinaryList right;
 
     public int getFrequency() {
         return frequency;
@@ -25,19 +24,19 @@ public class BinaryList implements Comparable<BinaryList> {
     }
 
     public BinaryList getLeft() {
-        return Left;
+        return left;
     }
 
     public void setLeft(BinaryList left) {
-        Left = left;
+        this.left = left;
     }
 
     public BinaryList getRight() {
-        return Right;
+        return right;
     }
 
     public void setRight(BinaryList right) {
-        Right = right;
+        this.right = right;
     }
 
 

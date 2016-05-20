@@ -1,27 +1,24 @@
 package ru.kpfu.itis.group11506.semestr2;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-// логика работы с i/o должна быть инкапсулирована
 public class Haffman {
 
-
-    private String s = "", binaryCode = "", finalCode = "", ss = "", stringReprOfTree = "";
-    private int[] ints1, ints;
-    private int currentLength;
+    private String finalCode = "", stringReprOfTree = "";
     private BinaryList takenTreeHead;
     private Map<Integer, String> map = new HashMap<>();
 
 
-    public String zipHim(String j) throws FileNotFoundException {
-//Считываем весь текст в строку:
-        readFromFile(j);
+    public String zipHim(String path) throws FileNotFoundException {
+        String binaryCode = "";
+        int[] ints1;
+//Считываем весь текст в массив целых чисел:
+        Io io = new Io();
+        ints1 = io.readToZip(path);
 // Создаем Аррей лист, и записываем туда РАЗНЫЕ буквы из текста + их частота появления в тексте:
-        List<BinaryList> arrayList = getBinaryLists();
+        List<BinaryList> arrayList = getBinaryLists(ints1);
 //Создаем Приоритетную очередь и заполняем ее элементами из Аррей Листа.
 // Приоритет - Частота появления в тексте:
         PriorityQueue<BinaryList> priorityQueue = getBinaryLists(arrayList);
@@ -38,16 +35,19 @@ public class Haffman {
             binaryCode = binaryCode + map.get(bytes2);
         }
 //Финальные преобразования бинарного кода в Символы - запись в finalCode:
-        transform();
+        transform(binaryCode);
 //Запись конечной сжатой строки в файл:
-        finalCode = stringReprOfTree + "x"+ints1.length+"y" + finalCode;
+        finalCode = stringReprOfTree + "x" + ints1.length + "y" + finalCode;
         return finalCode;
     }
 
 
-    public String unpackHim(String j) throws IOException {
+    public String unpackHim(String path) throws IOException {
+        int[] ints;
+        Io io = new Io();
 //Считываем весь текст в строку,(далее в массив интов)отделяем Код Дерева от Закодированного кода:
-        ints = getInts(j);
+        ints = io.readToUnzip(path);
+        stringReprOfTree = io.getStringReprOfTree();
 //Создаем дерево из кода :
         createUnpackedTree();
 //Для каждой буквы делаем двоичное представление добавляя если нехватает Лидирующие нули чтобы достичь
@@ -55,11 +55,11 @@ public class Haffman {
         String binaryCode2 = getString(ints);
 //Проходимся по дереву считывая нули и еденицы, если дошли до узла имеющего символ, конкатенируем его в
 // строку 'unpackedText', после этого начинаем опять с центрального узла считывать другие символы.
-        return getString(binaryCode2);
+        return getString(binaryCode2, io.getCurrentLength());
     }
 
 
-    private void transform() {
+    private void transform(String binaryCode) {
         int lastIndex = 0;
         while (lastIndex + 7 < binaryCode.length()) {
             String s = binaryCode.substring(lastIndex, lastIndex += 8);
@@ -95,7 +95,7 @@ public class Haffman {
     }
 
 
-    private List<BinaryList> getBinaryLists() {
+    private List<BinaryList> getBinaryLists(int[] ints1) {
         List<BinaryList> arrayList = new ArrayList<>();
         boolean b = false;
         for (int i = 0; i < ints1.length; i++) {
@@ -123,22 +123,6 @@ public class Haffman {
         return arrayList;
     }
 
-
-    private void readFromFile(String j) throws FileNotFoundException {
-        // Memory leak
-        Scanner in = new Scanner(new File(j));
-        while (in.hasNext()) {
-            s += in.nextLine() + "\n";
-        }
-        in.close();
-        ints1 = new int[s.length() - 2];
-        int index = 0;
-        char[] chars = s.toCharArray();
-        for (int i = 1; i < s.length() - 1; i++) {
-            ints1[index] = (int) chars[i];
-            index += 1;
-        }
-    }
 
     private void createMap(String way, BinaryList list) {
         if (list.getRight() == null && list.getLeft() == null) {
@@ -183,7 +167,7 @@ public class Haffman {
         takenTreeHead = stack.pop();
     }
 
-    private String getString(String binaryCode2) {
+    private String getString(String binaryCode2, int currentLength) {
         int length = 0;
         BinaryList word = takenTreeHead;
         String unpackedText = "";
@@ -224,30 +208,6 @@ public class Haffman {
             }
         }
         return binaryCode2;
-    }
-
-    private int[] getInts(String j) throws IOException {
-        Scanner in = new Scanner(new File(j));
-        while (in.hasNext()) {
-            ss += in.nextLine() + "\r";
-        }
-        in.close();
-        stringReprOfTree = ss.substring(0, ss.indexOf("x"));
-        currentLength = Integer.parseInt(ss.substring(ss.indexOf("x")+1, ss.indexOf("y")));
-
-        int[] ints = new int[ss.length() - ss.indexOf("y")];
-        try (FileReader reader = new FileReader(j)) {
-            int c, i = 0, indexAfterTree = ss.indexOf("y");
-            while ((c = reader.read()) != -1) {
-                if (indexAfterTree > -1) {
-                    indexAfterTree -= 1;
-                } else {
-                    ints[i] = (char) c;
-                    i += 1;
-                }
-            }
-        }
-        return ints;
     }
 
 
