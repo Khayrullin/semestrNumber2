@@ -125,6 +125,7 @@ public class Haffman {
 
 
     private void readFromFile(String j) throws FileNotFoundException {
+        // Memory leak
         Scanner in = new Scanner(new File(j));
         while (in.hasNext()) {
             s += in.nextLine() + "\n";

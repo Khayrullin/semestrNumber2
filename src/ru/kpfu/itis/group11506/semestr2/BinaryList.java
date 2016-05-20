@@ -4,6 +4,7 @@ public class BinaryList implements Comparable<BinaryList> {
 
     private int value;
     private int frequency;
+    // Java code convention?
     private BinaryList Left;
     private BinaryList Right;
 
