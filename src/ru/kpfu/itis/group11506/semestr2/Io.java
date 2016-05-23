@@ -1,7 +1,6 @@
 package ru.kpfu.itis.group11506.semestr2;
 
 import java.io.*;
-import java.util.Arrays;
 import java.util.Scanner;
 
 
@@ -49,26 +48,20 @@ public class Io {
 
 
     public int[] readToUnzip(String path) throws IOException {
-        String ss = "";
-        try (Scanner in = new Scanner(new File(path))) {
-            while (in.hasNext()) {
-                ss += in.nextLine() + "\r";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        stringReprOfTree = ss.substring(0, ss.indexOf("x"));
-        currentLength = Integer.parseInt(ss.substring(ss.indexOf("x") + 1, ss.indexOf("y")));
-        int[] ints = new int[ss.length() - ss.indexOf("y")];
+        int[] ints;
+        int symbol;
         try (FileReader reader = new FileReader(path)) {
-            int c, i = 0, indexAfterTree = ss.indexOf("y");
-            while ((c = reader.read()) != -1) {
-                if (indexAfterTree > -1) {
-                    indexAfterTree -= 1;
-                } else {
-                    ints[i] = (char) c;
-                    i += 1;
-                }
+            String ss = "";
+            while ((symbol = reader.read()) != -1) {
+                ss = ss + (char) symbol;
+            }
+            stringReprOfTree = ss.substring(0, ss.indexOf("x"));
+            currentLength = Integer.parseInt(ss.substring(ss.indexOf("x") + 1, ss.indexOf("y")));
+            ints = new int[ss.length() - ss.indexOf("y")];
+            int index = 0;
+            for (int i = ss.indexOf("y") + 1; i < ss.length(); i++) {
+                ints[index] = ss.charAt(i);
+                index += 1;
             }
         }
         return ints;

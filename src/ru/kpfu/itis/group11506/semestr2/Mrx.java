@@ -9,6 +9,7 @@ public class Mrx {
     public static void main(String[] args) {
 
         Options options = new Options();
+        boolean haveXOrZ = false;
         options.addOption("x", false, "Опция для разархивации");
         options.addOption("z", false, "Опция для Архивации");
         options.addOption("s", true, "Файл исходный");
@@ -23,6 +24,7 @@ public class Mrx {
                 } else if (cmd.getOptionValue("o") == null) {
                     System.err.print("Не введен путь файла для разархивации");
                 } else if (cmd.hasOption("z")) {
+                    haveXOrZ = true;
                     Haffman haffman = new Haffman();
                     Io io = new Io();
                     try {
@@ -33,6 +35,7 @@ public class Mrx {
 
                 }
                 if (cmd.hasOption("x")) {
+                    haveXOrZ= true;
                     Haffman haffman = new Haffman();
                     Io io = new Io();
                     try {
@@ -40,6 +43,10 @@ public class Mrx {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                }
+                if (!haveXOrZ){
+                    System.err.println("Введите -x если нужно разархивировать" +
+                            "и/или -z чтобы архивировать");
                 }
 
 
